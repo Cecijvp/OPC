@@ -20,6 +20,7 @@ msjT3     BYTE   "Temperatura ",0
 punto     BYTE   " : ",0
 tempMin   BYTE   "Minimo de las temperaturas: ",0 
 posMin    BYTE   "Posicion temperatura minima: ",0
+cambMsj    BYTE   "Total de cambios: ",0
 par       BYTE   " P",0
 impar     BYTE   " I",0
 n         DWORD   ?
@@ -30,7 +31,9 @@ limite    SDWORD   ?
 indiceMin SDWORD   ?
 dividir   SDWORD    2
 temps     SDWORD  10 DUP(?) ; como n puede llegar hasta 10 el arreglo lo rellene de ? 10 veces.
-
+cambios      DWORD  0
+ind1      DWORD  0
+ind2      DWORD  1
 .CODE
 ; Procedimiento principal
 main PROC
@@ -106,45 +109,49 @@ main PROC
             call WriteInt
             call CrLf
 
-    inverso:
-    
-         ;imprimir en orden inverso
-            mov EBX,0
-            mov ECX,n
-           .WHILE EBX<n
-                 mov EAX, [ESI]
-                 mov aux,EAX
-                 CDQ
-                 idiv dividir
-                 .IF EDX == 0
-                     call CrLf
-                     mov edx,OFFSET msjT3
-	               call WriteString
-                     mov EAX,ECX
-                     call WriteInt
-                     mov edx,OFFSET punto
-	               call WriteString
-                     mov EAX,aux
-                     call WriteInt
-                     mov edx,OFFSET par
-                     call WriteString
-                 .ELSE
-                     call CrLf
-                     mov edx,OFFSET msjT3
-	               call WriteString
-                     mov EAX,ECX
-                     call WriteInt
-                     mov edx,OFFSET punto
-	               call WriteString
-                     mov EAX,aux
-                     call WriteInt
-                     mov edx,OFFSET impar
-                     call WriteString
-                 .ENDIF    
-                 inc EBX
-                 dec ECX
-                 sub ESi, TYPE temps
-           .ENDW   
+    ordenar:
+        mov ESI, OFFSET temps
+        mov EDI, OFFSET temps
+        add EDI, TYPE temps
+        mov EBX,ind1
+        
+        .WHILE EBX< (n-1) 
+              mov ECX, ind2
+             .WHILE  ECX < n
+                mov EAX, [ESI]
+                mov EDX, [EDI]
+                .IF EAX>EDX
+                    xchg EAX,EDX
+                    mov [ESI], EAX
+                    mov [EDI], EDX
+                    inc cambios
+                .ENDIF
+                inc ECX
+                add EDI,TYPE temps
+             .ENDW
+                inc EBX
+                add ESI, TYPE temps
+                mov EDI,ESI
+                add EDI, TYPE temps
+                inc ind2
+        .ENDW
+
+          mov ESI, OFFSET temps
+          mov EBX,0  
+         .WHILE EBX< n
+             mov EAX, [ESI]
+             call writeInt
+             add ESI, TYPE temps
+             call Crlf
+             inc EBX
+         .ENDW
+         call Crlf
+         mov EDX, OFFSET cambMsj
+         call writeString
+         mov EAX,cambios
+         call writeInt
+         call Crlf
+
            
     salida:
             call CrLf
