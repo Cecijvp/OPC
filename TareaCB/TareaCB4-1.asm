@@ -1,26 +1,28 @@
-TITLE TareaCB           (TareaCB4.asm)
+TITLE *MASM Template	(ejerciciocb4.asm)*
 
-; convierte un DWORD a un ASCII y un SDWORD a ASCII
+; Descripcion general:
+; convertir Dword en ASCII y SDWORD en ASCII
 
 INCLUDE myIrvine.inc
+
 
 .DATA
 ; Declaracion de datos
 dirRet DWORD ?
 
 numb SDWORD ?
-buffS DWORD ?
+bufferSize DWORD ?
 
-numbInt SDWORD ?
+nInt SDWORD ?
 sizeDW DWORD ?
-buffStr DWORD ?
+bufferToStr DWORD ?
 ten DWORD 10
 digito BYTE ?
 asciiStr BYTE ?
 tmp DWORD ?
 
-messageGetN BYTE "Ingrese el numero: ", 0
-messageGetBuffer BYTE "Ingrese el tamano del buffer del String: ", 0
+msjN BYTE "Ingrese el numero: ", 0
+msjB BYTE "Ingrese el tamano del buffer del String: ", 0
 
 dwStr BYTE 10 DUP(0)
 sdwStr BYTE 11 DUP(0)
@@ -28,22 +30,22 @@ sdwStr BYTE 11 DUP(0)
 .CODE
 ; Procedimiento principal
 main PROC
-    mov EDX, OFFSET messageGetN
+    mov EDX, OFFSET msjN
     call WriteString
     call ReadInt
-    mov number, EAX
-    mov EDX, OFFSET messageGetBuffer
+    mov numb, EAX
+    mov EDX, OFFSET msjB
     call WriteString
     call ReadInt
     mov bufferSize, EAX
 
-    push number
+    push numb
     push bufferSize
     push LENGTHOF dwStr
     call dwToStr
     call CrLf
 
-    push number
+    push numb
     push bufferSize
     push LENGTHOF dwStr
     call sdwToStr
@@ -53,14 +55,14 @@ main ENDP
 ; Termina el procedimiento principal
 
 dwToStr PROC
-    pop dirTmp
+    pop dirRet
     pop sizeDW
     pop bufferToStr
-    pop numberInt
+    pop nInt
 
     mov ESI, bufferToStr
     dec ESI
-    mov EBX, SDWORD PTR numberInt
+    mov EBX, SDWORD PTR nInt
     mov digito, 0
     .WHILE SDWORD PTR EBX != 0
         mov EAX, EBX
@@ -87,18 +89,18 @@ dwToStr PROC
 
     mov EDX, OFFSET dwStr
     call WriteString
-    push dirTmp
+    push dirRet
     ret
 dwToStr ENDP
 
 sdwToStr PROC
-    pop dirTmp
+    pop dirRet
     pop sizeDW
     pop bufferToStr
-    pop numberInt
+    pop nInt
 
     mov ESI, bufferToStr
-    mov EBX, numberInt
+    mov EBX, nInt
     mov digito, 0
     .IF SDWORD PTR EBX >= 0
         mov dwStr[0], '+'
@@ -133,8 +135,9 @@ sdwToStr PROC
 
     mov EDX, OFFSET dwStr
     call WriteString
-    push dirTmp
+    push dirRet
     ret
 sdwToStr ENDP
 
 END main
+; Termina el área de Ensamble
